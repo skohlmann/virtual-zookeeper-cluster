@@ -3,7 +3,7 @@
   become: yes
   vars:
     zk:
-      version: 3.4.8
+      version: 3.4.9
       mirror: http://www-us.apache.org/dist
       dataDir: /var/lib/zookeeper
       installDir: "/opt"
