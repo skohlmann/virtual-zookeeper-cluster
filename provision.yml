@@ -5,9 +5,100 @@
     zk:
       version: 3.4.9
       mirror: http://www-us.apache.org/dist
-      dataDir: /var/lib/zookeeper
-      installDir: "/opt"
+      user: zookeeper
+      group: root
+      install_dir: /opt
+      data_dir: /opt/zookeeper/data
+      log_dir: /opt/zookeeper/log
   tasks:
+
+  - name: User | Create Group
+    become_user: root
+    group:
+      name: "{{zk.group}}"
+      state: present
+
+  - name: User | Create User
+    become_user: root
+    user:
+      name: "{{zk.user}}"
+      group: "{{zk.group}}"
+      state: present
+
+
+  - name: Zookeeper | Create base directory
+    become_user: root
+    file:
+      path: "{{zk.install_dir}}"
+      owner: "root"
+      group: "root"
+      mode: 0755
+      state: directory
+
+  - name: Zookeeper | Download
+    get_url:
+      url: http://www-us.apache.org/dist/zookeeper/zookeeper-{{zk.version}}/zookeeper-{{zk.version}}.tar.gz
+      dest: /tmp/zookeeper-{{zk.version}}.tar.gz
+
+  - name: Zookeeper | Extract Zookeeper
+    become_user: root
+    command: tar xzf /tmp/zookeeper-{{zk.version}}.tar.gz chdir="{{zk.install_dir}}"
+
+  - name: Zookeeper | Create data directory
+    become_user: root
+    file:
+      path: "{{zk.data_dir}}"
+      owner: "{{zk.user}}"
+      group: "{{zk.group}}"
+      mode: 0755
+      state: directory
+
+  - name: Zookeeper | Create log directory
+    become_user: root
+    file:
+      path: "{{zk.log_dir}}"
+      owner: "{{zk.user}}"
+      group: "{{zk.group}}"
+      mode: 0755
+      state: directory
+
+  - name: Zookeeper | Update permissions
+    become_user: root
+    file:
+      path: "{{ zk.install_dir }}"
+      owner: "{{ zk.user }}"
+      group: "{{ zk.group }}"
+      recurse: yes
+      mode: 0755
+      state: directory
+
+  - name: ZooKeeper | Ensure zoo.conf is present
+    template:
+      src: "templates/zk/zoo.cfg"
+      dest: "{{zk.install_dir}}/zookeeper-{{zk.version}}/conf"
+
+  - name: ZooKeeper | Ensure myid is set to {{cluster_node_seq}} in {{zk.data_dir}}/myid
+    template:
+      src: "templates/zk/myid"
+      dest: "{{zk.data_dir}}"
+
+  - name: ZooKeeper | Ensure zkEnv.sh is presnt
+    template:
+      src: "templates/zk/zkEnv.sh"
+      dest: "{{zk.install_dir}}/zookeeper-{{zk.version}}/bin"
+
+  - name: Zookeeper | Init as service
+    template:
+      src: "templates/zk/zookeeper"
+      dest: "/etc/init.d/"
+      mode: 0755
+
+  - name: Zookeeper | Configure autostart
+    file:
+      src: /etc/init.d/zookeeper
+      dest: /etc/rc3.d/S98zookeeper
+      state: link
+
 
   # Install Oracle JVM
   - name: Java | Ensure the Oracle JVM repository is present
@@ -21,30 +112,6 @@
       name: oracle-java7-installer
       state: latest
 
-  # Download Zookeeper
-  - name: Zookeeper | Setting internal variable
-    set_fact: zk_name="zookeeper-{{zk.version}}"
-  - name: Zookeeper | Setting internal variable
-    set_fact: zk_dir="{{zk.installDir}}/{{zk_name}}"
-  - name: Zookeeper | Ensure Zookeeper tar is downloaded
-    get_url:
-      url: "{{zk.mirror}}/zookeeper/{{zk_name}}/{{zk_name}}.tar.gz"
-      dest: "/tmp"
-  - name: ZooKeeper | Ensure tar is extracted
-    command: tar xzf /tmp/{{zk_name}}.tar.gz chdir="{{zk.installDir}}"
-
-  # Config and start Zookeeper
-  - name: ZooKeeper | Ensure zoo.conf is present
-    template:
-      src: "templates/zk/zoo.cfg"
-      dest: "{{zk_dir}}/conf"
-  - name: ZooKeeper | Ensures data dir {{zk.dataDir}} exists
-    file:
-      path: "{{zk.dataDir}}"
-      state: directory
-  - name: ZooKeeper | Ensure myid is set to {{cluster_node_seq}} in {{zk.dataDir}}/myid
-    template:
-      src: "templates/zk/myid"
-      dest: "{{zk.dataDir}}"
   - name: ZooKeeper | Ensure the service is running
-    shell: "{{zk_dir}}/bin/zkServer.sh restart"
+    shell: "{{zk.install_dir}}/zookeeper-{{zk.version}}//bin/zkServer.sh restart"
+
