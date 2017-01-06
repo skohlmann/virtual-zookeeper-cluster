@@ -25,6 +25,19 @@
       group: "{{zk.group}}"
       state: present
 
+  # Install Oracle JVM
+  - name: Java | Ensure the Oracle JVM repository is present
+    apt_repository:
+      repo: ppa:webupd8team/java
+      state: present
+
+  - name: Java | Ensure the Oracle license is accepted
+    shell: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+
+  - name: Java | Ensure Oracle Java 7 is installed
+    apt:
+      name: oracle-java7-installer
+      state: latest
 
   - name: Zookeeper | Create base directory
     become_user: root
@@ -99,19 +112,6 @@
       dest: /etc/rc3.d/S98zookeeper
       state: link
 
-
-  # Install Oracle JVM
-  - name: Java | Ensure the Oracle JVM repository is present
-    apt_repository:
-      repo: ppa:webupd8team/java
-      state: present
-  - name: Java | Ensure the Oracle license is accepted
-    shell: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
-  - name: Java | Ensure Oracle Java 7 is installed
-    apt:
-      name: oracle-java7-installer
-      state: latest
-
   - name: ZooKeeper | Ensure the service is running
+    become_user: root
     shell: "{{zk.install_dir}}/zookeeper-{{zk.version}}//bin/zkServer.sh restart"
-
