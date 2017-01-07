@@ -1,18 +1,20 @@
 # Virtual Apache ZooKeeper cluster
 
-This script creates a virtual 3-node [Apache ZooKeeper](http://zookeeper.apache.org/)
+This script creates a virtual 2-node [Apache ZooKeeper](http://zookeeper.apache.org/)
 cluster on your local machine using [Vagrant](https://www.vagrantup.com/), [VirtualBox](https://www.virtualbox.org/) and [Ansible](http://www.ansible.com/home).
 
 The Zookeeper service will run in a truly replicated mode over several machines, so you can experiment with host failures, client connections, misc cluster configurations, etc.
 
 Also, if you want to create a virtual cluster for other services built on top of Zookeeper (e.g. Apache Kafka, HBase, Solr, Neo4j), this script might help as a starting point.
 
+__Note__: This is a proof of concept and test installation only. Do ot use in production.
+
 ## Cluster specs
 
 - System: 3x Ubuntu 14.04 server
 - Memory: 256 MB each host
 - IP address: 192.168.5.100-102
-- Hostnames: `node-[x]` with `x` have values 1, 2 or 3
+- Hostnames: `node-[x]` with `x` have values 1 or 2
 - Zookeeper version: 3.4.8
 - JVM: Oracle Java-7
 
@@ -28,36 +30,14 @@ Depending on your hardware and network connection, the script execution might ta
 
 ### 1. Install Vagrant, VirtualBox and Ansible on your machine
 
-For Mac, this can be done with Homebrew:
-```
-brew install caskroom/cask/brew-cask
-brew cask install virtualbox
-brew cask install vagrant
-brew install ansible
-```
+1. Install [VirtualBox](https://www.virtualbox.org/)
+2. Install [Vagrant](https://www.vagrantup.com/)
+3. Install [Ansible](https://www.ansible.com/)
+4. Clone this repository
+5. Enter cloned repository
+6. Execute `vagrant provision && vagrant up`
 
-Make sure you are running Ansible v1.7.2 or higher with `ansible --version`.
-
-For other systems, checkout the installation pages of [Vagrant](https://docs.vagrantup.com/v2/installation/), [VirtualBox](https://www.virtualbox.org/wiki/Downloads) and [Ansible](http://docs.ansible.com/intro_installation.html).
-
-### 2. Clone this repo
-
-```
-git clone https://github.com/mkrcah/virtual-zookeeper-cluster.git
-cd virtual-zookeeper-cluster
-```
-
-
-### 3. Start the cluster with Vagrant
-
-```
-vagrant up
-```
-
-This command will create and boot the VMs (using VirtualBox), provision each node with JVM and Zookeeper and start the Zookeeper service on each node (using Ansible). Note, that this command might take a while
-since it needs to download the Ubuntu image and the JVM.
-
-### 4. Test if the Zookeeper is running
+### 2. Test if the Zookeeper is running
 
 Each VM should now have the Zookeeper running on port 2181. Test that the service is running in non-error state by:
 ```
@@ -103,6 +83,29 @@ vagrant@node-1:/opt/zookeeper-3.4.7/bin$ ./zkCli.sh -server 192.168.5.101:2181
 [zk: 192.168.5.101:2181(CONNECTED) 1] get /zk_test
 my_data
 ```
+
+## Shotdown and restart
+
+Stop the cluster with
+
+- `vagrant halt`
+
+Restart the cluster with 
+
+- `vagrant reload`
+
+
+### Restart ZooKeeper
+
+__Note__: After restart you must also start the ZooKeeper server manual. Automatic restart is yet not configured. I'll implement this in a further version.
+
+Steps to restart Zookepper:
+
+1. Login to **node 1**: `vagrant ssh node-1`
+2. Start ZooKeeper: `sudo service zookeeper start`
+3. Quit **node-1**: `exit`
+
+Repeat with **node-2**.
 
 ---
 
