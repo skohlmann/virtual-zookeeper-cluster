@@ -12,6 +12,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   cluster = {
     'node-1' => "192.168.5.100",
     'node-2' => "192.168.5.101",
+    'node-2' => "192.168.5.102",
   }
 
   cluster.each_with_index do |(short_name, ip), idx|
