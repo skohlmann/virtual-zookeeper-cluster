@@ -14,8 +14,8 @@ __Note__: This is a proof of concept and test installation only. Do ot use in pr
 - System: 3x Ubuntu 14.04 server
 - Memory: 256 MB each host
 - IP address: 192.168.5.100-102
-- Hostnames: `node-[x]` with `x` have values 1 or 2
-- Zookeeper version: 3.4.8
+- Hostnames: `node-[x]` with `x` have values 1, 2 or 3
+- Zookeeper version: 3.4.9
 - JVM: Oracle Java-7
 
 You can easily customize the cluster parameters in the following files:
