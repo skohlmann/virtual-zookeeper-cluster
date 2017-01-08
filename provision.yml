@@ -106,12 +106,16 @@
       dest: "/etc/init.d/"
       mode: 0755
 
-  - name: Zookeeper | Configure autostart
+  - name: Zookeeper | Configure service
     file:
       src: /etc/init.d/zookeeper
-      dest: /etc/rc3.d/S98zookeeper
+      dest: /etc/rc2.d/S99zookeeper
       state: link
 
-  - name: ZooKeeper | Ensure the service is running
-    become_user: root
-    shell: "{{zk.install_dir}}/zookeeper-{{zk.version}}//bin/zkServer.sh restart"
+  - name: ZooKeeper | Service
+    service:
+      name: zookeeper
+      enabled: yes
+      state: reloaded
+    ignore_errors: true
+
