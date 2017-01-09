@@ -10,9 +10,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   memory_mb = 256
 
   cluster = {
-    'node-1' => "192.168.5.100",
-    'node-2' => "192.168.5.101",
-    'node-2' => "192.168.5.102",
+    'zk-node-1' => "192.168.5.100",
+    'zk-node-2' => "192.168.5.101",
+    'zk-node-3' => "192.168.5.102",
   }
 
   cluster.each_with_index do |(short_name, ip), idx|
