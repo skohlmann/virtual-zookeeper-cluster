@@ -1,6 +1,6 @@
 # Virtual Apache ZooKeeper cluster
 
-This script creates a virtual 2-node [Apache ZooKeeper](http://zookeeper.apache.org/)
+This script creates a virtual 3-node [Apache ZooKeeper](http://zookeeper.apache.org/)
 cluster on your local machine using [Vagrant](https://www.vagrantup.com/), [VirtualBox](https://www.virtualbox.org/) and [Ansible](http://www.ansible.com/home).
 
 The Zookeeper service will run in a truly replicated mode over several machines, so you can experiment with host failures, client connections, misc cluster configurations, etc.
