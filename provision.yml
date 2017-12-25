@@ -3,7 +3,7 @@
   become: yes
   vars:
     zk:
-      version: 3.4.9
+      version: 3.4.11
       mirror: http://www-us.apache.org/dist
       user: zookeeper
       group: root
@@ -25,19 +25,25 @@
       group: "{{zk.group}}"
       state: present
 
-  # Install Oracle JVM
-  - name: Java | Ensure the Oracle JVM repository is present
-    apt_repository:
-      repo: ppa:webupd8team/java
-      state: present
+  - name: Install add-apt-repostory
+    become: yes
+    apt: name=software-properties-common state=latest
 
-  - name: Java | Ensure the Oracle license is accepted
-    shell: echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+  - name: Add Oracle Java Repository
+    become: yes
+    apt_repository: repo='ppa:webupd8team/java'
 
-  - name: Java | Ensure Oracle Java 7 is installed
-    apt:
-      name: oracle-java7-installer
-      state: latest
+  - name: Accept Java 8 License
+    become: yes
+    debconf: name='oracle-java8-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
+
+  - name: Install Oracle Java 8
+    become: yes
+    apt: name={{item}} state=latest
+    with_items:
+      - oracle-java8-installer
+      - ca-certificates
+      - oracle-java8-set-default
 
   - name: Zookeeper | Create base directory
     become_user: root
