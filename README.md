@@ -56,7 +56,7 @@ and play with the [command-line tool](http://zookeeper.apache.org/doc/current/zo
 
 ##### 1. Log into one of the host machines, e.g. `node-1`
 ```
-vagrant ssh node-1
+vagrant ssh zk-node-1
 ```
 
 ##### 2. Connect to Zookeeper running on localhost with the `zkCli.sh` command-line tool
@@ -71,7 +71,7 @@ vagrant@node-1:/opt/zookeeper-3.4.7/bin$ ./zkCli.sh -server localhost:2181
 Created /zk_test
 ```
 
-##### 4. Exit the console and connect to Zookeeper running on `node-2` (which runs on `192.168.5.101`)
+##### 4. Exit the console and connect to Zookeeper running on `zk-node-2` (which runs on `192.168.5.101`)
 ```
 vagrant@node-1:/opt/zookeeper-3.4.7/bin$ ./zkCli.sh -server 192.168.5.101:2181
 ```
@@ -101,7 +101,7 @@ __Note__: After restart you must also start the ZooKeeper server manual. Automat
 
 Steps to restart Zookepper:
 
-1. Login to **node 1**: `vagrant ssh node-1`
+1. Login to **node 1**: `vagrant ssh zk-node-1`
 2. Start ZooKeeper: `sudo service zookeeper start`
 3. Quit **node-1**: `exit`
 
